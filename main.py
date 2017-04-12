@@ -31,11 +31,11 @@ class MainHandler(Handler):
     def get(self):
         self.render_front()
 
+
 class NewPostHandler(Handler):
     def render_form(self, title ="", post = "", error = ""):
-        posts = db.GqlQuery("SELECT * FROM Post ORDER BY created DESC LIMIT 5")
-        self.render("newpost.html", title=title, post=post, error=error, posts=posts)
-        
+        self.render("newpost.html", title=title, post=post, error=error)
+
     def get(self):
         self.render_form()
 
@@ -52,7 +52,22 @@ class NewPostHandler(Handler):
             error = "We need both a title and a post!"
             self.render_form(error = error, title=title, post=post)
 
+
+class ViewPostHandler(Handler):
+
+    def get(self, id):
+        viewpost = Post.get_by_id(int(id))
+
+        if viewpost:
+            self.render("viewpost.html", post=viewpost)
+        # if we can't find the movie, reject.
+        else:
+            error = "This post was not found."
+            self.response.write(error)
+
+
 app = webapp2.WSGIApplication([
     ('/blog', MainHandler),
-    ('/newpost', NewPostHandler)
+    ('/newpost', NewPostHandler),
+    webapp2.Route('/blog/<id:\d+>', ViewPostHandler)
 ], debug=True)
