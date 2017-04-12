@@ -46,8 +46,9 @@ class NewPostHandler(Handler):
         if title and post:
             p = Post(title = title, post = post)
             p.put()
+            post_id = str(p.key().id())
+            self.redirect("/blog/" + post_id)
 
-            self.redirect("/blog")
         else:
             error = "We need both a title and a post!"
             self.render_form(error = error, title=title, post=post)
