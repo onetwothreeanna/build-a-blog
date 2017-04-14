@@ -44,14 +44,17 @@ class MainHandler(Handler):
 
     def get(self):
         page = self.request.get('page')
+        display = 5
         if not page or page == 1:
-            self.render_front(5, 0)
+            prevpage = 0
+            nextpage = 2
+            offset = 0
         else:
             page = int(page)
             prevpage = page-1
             nextpage = page+1
             offset = self.set_offset(page)  #Pass page through set_offset function above
-            self.render_front(5, offset = offset, prevpage = prevpage, nextpage = nextpage)
+        self.render_front(display, offset = offset, prevpage = prevpage, nextpage = nextpage)
 
 
 class NewPostHandler(Handler):
