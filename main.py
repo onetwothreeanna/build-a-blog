@@ -31,9 +31,9 @@ class Post(db.Model):
 
 class MainHandler(Handler):
     """Renders blog home"""
-    def render_front(self, limit, offset, title ="", post = "", error = "", page = ""):
+    def render_front(self, limit, offset, title ="", post = "", error = "", page = "", prevpage = "", nextpage = ""):
         posts = get_posts(limit, offset)
-        self.render("front.html", title=title, post=post, error=error, posts=posts, page = page)
+        self.render("front.html", title=title, post=post, error=error, posts=posts, page = page, prevpage = prevpage, nextpage = nextpage)
 
     def set_offset(self, page):
         offset = 0
@@ -48,8 +48,10 @@ class MainHandler(Handler):
             self.render_front(5, 0)
         else:
             page = int(page)
+            prevpage = page-1
+            nextpage = page+1
             offset = self.set_offset(page)  #Pass page through set_offset function above
-            self.render_front(5, offset)
+            self.render_front(5, offset = offset, prevpage = prevpage, nextpage = nextpage)
 
 
 class NewPostHandler(Handler):
