@@ -15,7 +15,18 @@
             <hr>
         {% endfor %}
         <div class ="navbar" id="botnav">
-            <a href="/blog?page={{ prevpage }}">< prev</a>   |   <a href="/blog?page={{ nextpage }}">next ></a></li>
+            {% if not prev_disp %}
+            |   <a href="/blog?page={{ nextpage }}">next ></a>
+            {% endif %}
+
+            {% if prev_disp and next_disp %}
+            <a href="/blog?page={{ prevpage }}">< prev</a>   |   <a href="/blog?page={{ nextpage }}">next ></a>
+            {% endif %}
+
+            {% if not next_disp %}
+            <a href="/blog?page={{ prevpage }}">< prev</a>   |
+            {% endif %}
+
     </body>
 
 {% endblock %}

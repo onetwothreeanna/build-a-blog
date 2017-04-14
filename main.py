@@ -31,9 +31,10 @@ class Post(db.Model):
 
 class MainHandler(Handler):
     """Renders blog home"""
-    def render_front(self, limit, offset, title ="", post = "", error = "", page = "", prevpage = "", nextpage = ""):
+    def render_front(self, limit, offset, title ="", post = "", error = "", page = "", prevpage = "", nextpage = "", prev_disp = True,
+        next_disp = True):
         posts = get_posts(limit, offset)
-        self.render("front.html", title=title, post=post, error=error, posts=posts, page = page, prevpage = prevpage, nextpage = nextpage)
+        self.render("front.html", title=title, post=post, error=error, posts=posts, page = page, prevpage = prevpage, nextpage = nextpage, prev_disp = prev_disp, next_disp = next_disp)
 
     def set_offset(self, page):
         offset = 0
@@ -41,21 +42,35 @@ class MainHandler(Handler):
             offset+= 5
         return offset
 
+    def display_count(self, page, display):
+        posts = db.GqlQuery("SELECT * FROM Post")
+        post_count = posts.count()
+        display_num = page*display
+        result = display_num > post_count
+        return result
 
     def get(self):
         page = self.request.get('page')
         display = 5
-        if not page or page == 1:
+        prev_disp = True
+        next_disp = True
+
+        if not page or int(page)<=1:  #If the page is not there or is 0, negative, or one, do not show prev nav link
             prevpage = 0
             nextpage = 2
             offset = 0
-        else:
+            prev_disp = False
+
+        elif int(page)>1:   #if page number * page display is greater than total page count, do not show next button
             page = int(page)
+            count = self.display_count(page, display)
             prevpage = page-1
             nextpage = page+1
-            offset = self.set_offset(page)  #Pass page through set_offset function above
-        self.render_front(display, offset = offset, prevpage = prevpage, nextpage = nextpage)
+            if count:
+                next_disp = False
 
+            offset = self.set_offset(page)  #Pass page through set_offset function above
+        self.render_front(display, offset = offset, prevpage = prevpage, nextpage = nextpage, prev_disp = prev_disp, next_disp = next_disp)
 
 class NewPostHandler(Handler):
     """Renders new post form and handles submission to permalinks"""
